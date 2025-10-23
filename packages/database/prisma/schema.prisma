@@ -1,13 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/client"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  output        = "../src/generated/client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 enum AdminActionType {
   ADMIN_PROMOTION
@@ -28,42 +28,43 @@ enum AdminActionType {
 }
 
 model Role {
-  id              String            @id @default(cuid())
-  name            String            @unique
-  description     String?
-  isActive        Boolean           @default(true)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   rolePermissions RolePermission[]
   users           User[]
+  admins          Admin[]
 }
 
 model PermissionGroup {
-  id              String            @id @default(cuid())
-  name            String            // e.g. "Billing", "Bins", "Customers"
-  orderIndex      Int?              // optional for sorting
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id         String   @id @default(cuid())
+  name       String // e.g. "Billing", "Bins", "Customers"
+  orderIndex Int? // optional for sorting
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  permissions     Permission[]
+  permissions Permission[]
 }
 
 model Permission {
-  id              String            @id @default(cuid())
-  groupId         String?           // link to PermissionGroup
-  name            String            // e.g. "Billing Profiles", "Cycle Count Dashboard"
-  key             String            @unique // machine key, e.g. "billing_profiles"
-  description     String?
-  canView         Boolean           @default(false)
-  canCreate       Boolean           @default(false)
-  canEdit         Boolean           @default(false)
-  canDelete       Boolean           @default(false)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id          String   @id @default(cuid())
+  groupId     String? // link to PermissionGroup
+  name        String // e.g. "Billing Profiles", "Cycle Count Dashboard"
+  key         String   @unique // machine key, e.g. "billing_profiles"
+  description String?
+  canView     Boolean  @default(false)
+  canCreate   Boolean  @default(false)
+  canEdit     Boolean  @default(false)
+  canDelete   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  group           PermissionGroup?  @relation(fields: [groupId], references: [id])
+  group           PermissionGroup? @relation(fields: [groupId], references: [id])
   rolePermissions RolePermission[]
 }
 
@@ -76,8 +77,8 @@ model RolePermission {
   canEdit      Boolean @default(false)
   canDelete    Boolean @default(false)
 
-  role         Role       @relation(fields: [roleId], references: [id])
-  permission   Permission @relation(fields: [permissionId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
 
   @@unique([roleId, permissionId])
 }
@@ -86,7 +87,7 @@ model User {
   id                 String              @id @default(cuid())
   name               String
   email              String              @unique
-  roleId          String?
+  roleId             String?
   emailVerified      Boolean
   image              String?
   registeredFromApp  String?
@@ -98,8 +99,7 @@ model User {
   invitations        Invitation[]
   userCompanyProfile UserCompanyProfile?
   wmsUsers           WMSUsers?
-  role            Role?             @relation(fields: [roleId], references: [id])
-
+  role               Role?               @relation(fields: [roleId], references: [id])
 
   @@map("user")
 }
@@ -165,25 +165,25 @@ model Invitation {
 }
 
 model Organization {
-  id                String                 @id @default(cuid())
-  name              String
-  slug              String?
-  logo              String?
-  metadata          String?
-  companyPhone      String?
-  street1           String?
-  street2           String?
-  city              String?
-  state             String?
-  zipCode           String?
-  country           String?
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime?              @updatedAt
-  pro               Boolean                @default(false)
-  locations         Location[]
-  locationTypes     LocationType[]
-  invitations       Invitation[]           
-  companies         Company[]
+  id            String         @id @default(cuid())
+  name          String
+  slug          String?
+  logo          String?
+  metadata      String?
+  companyPhone  String?
+  street1       String?
+  street2       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  country       String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime?      @updatedAt
+  pro           Boolean        @default(false)
+  locations     Location[]
+  locationTypes LocationType[]
+  invitations   Invitation[]
+  companies     Company[]
 
   @@unique([slug])
   @@map("organization")
@@ -225,17 +225,23 @@ model LocationType {
 }
 
 model Admin {
-  id          String           @id
-  username    String           @unique
-  password    String
-  email       String           @unique
-  firstName   String?
-  lastName    String?
-  isActive    Boolean          @default(true)
-  avatar      String?
-  phone       String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  isActive  Boolean  @default(true)
+  avatar    String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 🔗 New relation to Role
+  roleId String? @db.Text
+  role   Role?   @relation(fields: [roleId], references: [id], onDelete: SetNull)
+
+  // Existing relations
   actionLogs  AdminActionLog[]
   ipHistories IPHistory[]
   LogComment  LogComment[]
@@ -278,7 +284,7 @@ model LogComment {
 }
 
 model Company {
-  id             String        @id @default(cuid())
+  id             String       @id @default(cuid())
   name           String
   street         String?
   street2        String?
@@ -290,10 +296,10 @@ model Company {
   phone          String?
   logo           String?
   postalCode     String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
   organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
   Invitation     Invitation[]
 
   @@map("company")
