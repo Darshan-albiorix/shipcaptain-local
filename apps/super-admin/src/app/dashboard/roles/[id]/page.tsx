@@ -4,14 +4,14 @@ import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { RoleFormData, InternalPermissionCategory, InternalPermission } from "../types";
-import { rolesAPI } from "../api";
+import { createRole, updateRole, getRole, getPermissions } from "../actions";
 
 export default function RoleDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const roleId = params?.id ?? "role";
   const isNew = roleId === 'new';
-  const display = useMemo(() => (isNew ? 'Create Role' : roleId.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())), [isNew, roleId]);
+  const display = useMemo(() => (isNew ? 'Create Role' : 'Edit Role'), [isNew, roleId]);
 
   // Form state
   const [formData, setFormData] = useState<RoleFormData>({
@@ -44,8 +44,28 @@ export default function RoleDetailPage() {
 
   const loadPermissions = async () => {
     try {
-      const permissions = await rolesAPI.getPermissions();
-      setCategories(permissions);
+      const result = await getPermissions();
+      if (result.success) {
+        // Transform the API response to internal format
+        const transformed = result.data.map((category: any) => ({
+          id: category.group.toLowerCase().replace(/\s+/g, '-'),
+          name: category.group,
+          items: category.permissions.map((permission: any) => ({
+            id: permission.id,
+            name: permission.name,
+            category: category.group.toLowerCase().replace(/\s+/g, '-'),
+            flags: {
+              view: permission.canView,
+              create: permission.canCreate,
+              edit: permission.canEdit,
+              delete: permission.canDelete,
+            }
+          }))
+        }));
+        setCategories(transformed);
+      } else {
+        setError(result.message || 'Failed to load permissions');
+      }
     } catch (err) {
       setError('Failed to load permissions');
       console.error('Error loading permissions:', err);
@@ -56,17 +76,39 @@ export default function RoleDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const role = await rolesAPI.getRole(roleId);
-      const rolePermissions = await rolesAPI.getRolePermissions(roleId);
       
-      setFormData({
-        name: role.name,
-        description: role.description || '',
-        isActive: role.isActive,
-        permissions: []
-      });
-      setActive(role.isActive);
-      setCategories(rolePermissions);
+      const result = await getRole(roleId);
+      if (result.success) {
+        const role = result.data;
+        
+        setFormData({
+          name: role.name,
+          description: role.description || '',
+          isActive: role.isActive,
+          permissions: []
+        });
+        setActive(role.isActive);
+        
+        // Transform the role permissions to internal format
+        const transformed = role.permissions.map((category: any) => ({
+          id: category.group.toLowerCase().replace(/\s+/g, '-'),
+          name: category.group,
+          items: category.permissions.map((permission: any) => ({
+            id: permission.id,
+            name: permission.name,
+            category: category.group.toLowerCase().replace(/\s+/g, '-'),
+            flags: {
+              view: permission.canView,
+              create: permission.canCreate,
+              edit: permission.canEdit,
+              delete: permission.canDelete,
+            }
+          }))
+        }));
+        setCategories(transformed);
+      } else {
+        setError(result.message || 'Failed to load role data');
+      }
     } catch (err) {
       setError('Failed to load role data');
       console.error('Error loading role:', err);
@@ -120,18 +162,24 @@ export default function RoleDetailPage() {
       });
 
       const roleData = {
-        ...formData,
-        permissions,
-        isActive: active
+        name: formData.name,
+        description: formData.description,
+        isActive: active,
+        permissions
       };
 
+      let result;
       if (isNew) {
-        await rolesAPI.createRole(roleData);
+        result = await createRole(roleData);
       } else {
-        await rolesAPI.updateRole(roleId, roleData);
+        result = await updateRole(roleId, roleData);
       }
 
-      router.push('/dashboard/roles');
+      if (result.success) {
+        router.push('/dashboard/roles');
+      } else {
+        setError(result.message || (isNew ? 'Failed to create role' : 'Failed to update role'));
+      }
     } catch (err) {
       setError(isNew ? 'Failed to create role' : 'Failed to update role');
       console.error('Error saving role:', err);
