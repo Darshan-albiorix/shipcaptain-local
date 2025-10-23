@@ -96,6 +96,56 @@ export class RolesAPI {
     }
   }
 
+  async getRolePermissions(id: string): Promise<InternalPermissionCategory[]> {
+    try {
+      const response = await fetch(`/api/roles/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const apiResponse = await response.json();
+      if (!apiResponse.success) {
+        throw new Error(apiResponse.message);
+      }
+      
+      const role = apiResponse.data;
+      // Transform the role permissions to internal format
+      return this.transformRolePermissionsToInternal(role.permissions);
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
+      // Fallback to base permissions if API fails
+      return this.getPermissions();
+    }
+  }
+
+  private transformRolePermissionsToInternal(rolePermissions: any[]): InternalPermissionCategory[] {
+    // Group permissions by category
+    const groupedPermissions = rolePermissions.reduce((acc, group: any) => {
+      acc[group.group] = group.permissions;
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    return Object.entries(groupedPermissions).map(([groupName, permissions]) => ({
+      id: groupName.toLowerCase().replace(/\s+/g, '-'),
+      name: groupName,
+      items: (permissions as any[]).map((permission: any) => ({
+        id: permission.id,
+        name: permission.name,
+        category: groupName.toLowerCase().replace(/\s+/g, '-'),
+        flags: {
+          view: permission.canView,
+          create: permission.canCreate,
+          edit: permission.canEdit,
+          delete: permission.canDelete,
+        }
+      }))
+    }));
+  }
+
   async createRole(data: CreateRoleRequest): Promise<Role> {
     try {
       const response = await fetch('/api/roles', {

@@ -28,23 +28,23 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 
     // Map rolePermissions into a lookup table
     const rolePermissionMap = new Map(
-      role.rolePermissions.map((rp) => [rp.permissionId, rp.permission])
+      role.rolePermissions.map((rp) => [rp.permissionId, rp])
     );
 
     // ✅ Build grouped response with merged flags (canView, canCreate, etc.)
     const formatted = allGroups.map((group) => ({
       group: group.name,
       permissions: group.permissions.map((perm) => {
-        const assigned = rolePermissionMap.get(perm.id);
+        const rolePermission = rolePermissionMap.get(perm.id);
         return {
           id: perm.id,
           name: perm.name,
           key: perm.key,
           description: perm.description,
-          canView: assigned?.canView ?? perm.canView,
-          canCreate: assigned?.canCreate ?? perm.canCreate,
-          canEdit: assigned?.canEdit ?? perm.canEdit,
-          canDelete: assigned?.canDelete ?? perm.canDelete,
+          canView: rolePermission?.canView ?? perm.canView,
+          canCreate: rolePermission?.canCreate ?? perm.canCreate,
+          canEdit: rolePermission?.canEdit ?? perm.canEdit,
+          canDelete: rolePermission?.canDelete ?? perm.canDelete,
         };
       }),
     }));

@@ -73,6 +73,10 @@ export async function POST(req: Request) {
         rolePermissions: {
           create: permissionMappings.map((perm) => ({
             permissionId: perm.permissionId,
+            canView: perm.canView,
+            canCreate: perm.canCreate,
+            canEdit: perm.canEdit,
+            canDelete: perm.canDelete,
           })),
         },
       },

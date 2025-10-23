@@ -57,6 +57,8 @@ export default function RoleDetailPage() {
       setIsLoading(true);
       setError(null);
       const role = await rolesAPI.getRole(roleId);
+      const rolePermissions = await rolesAPI.getRolePermissions(roleId);
+      
       setFormData({
         name: role.name,
         description: role.description || '',
@@ -64,6 +66,7 @@ export default function RoleDetailPage() {
         permissions: []
       });
       setActive(role.isActive);
+      setCategories(rolePermissions);
     } catch (err) {
       setError('Failed to load role data');
       console.error('Error loading role:', err);
