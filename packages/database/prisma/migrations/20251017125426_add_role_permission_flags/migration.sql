@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "RolePermission" ADD COLUMN     "canCreate" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "canDelete" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "canEdit" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "canView" BOOLEAN NOT NULL DEFAULT false;

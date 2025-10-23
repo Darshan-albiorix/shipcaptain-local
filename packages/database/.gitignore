@@ -1,0 +1,14 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+# Generated Prisma files
+/generated/
+/src/generated/
+
+# Build artifacts
+/dist/
+/build/
+
+# Logs
+*.log

@@ -1,0 +1,33 @@
+{
+  "name": "super-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.17.1",
+    "@repo/ui": "*",
+    "next": "15.5.5",
+    "next-swagger-doc": "^0.4.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "swagger-ui-dist": "^5.29.4",
+    "swagger-ui-react": "^5.29.4"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/swagger-ui-dist": "^3.30.6",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# turborepo
+.turbo/
+
+# next
+.next/
+out/
+
+# builds
+dist/
+build/
+
+# env
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Generated files
+**/generated/
+**/src/generated/
+
+# misc
+*.log
+package-lock.json
+yarn.lock
+
