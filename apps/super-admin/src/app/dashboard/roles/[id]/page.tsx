@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { RoleFormData, InternalPermissionCategory, InternalPermission } from "../types";
@@ -218,8 +219,8 @@ export default function RoleDetailPage() {
                   {categories.map((cat) => {
                     const isCollapsed = !!collapsed[cat.id];
                     return (
-                      <>
-                        <tr key={cat.id} className="bg-black/5">
+                      <React.Fragment key={cat.id}>
+                        <tr className="bg-black/5">
                           <td className="py-3 px-4 font-medium">
                             <button
                               type="button"
@@ -251,7 +252,7 @@ export default function RoleDetailPage() {
                               ))}
                             </tr>
                           ))}
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </tbody>

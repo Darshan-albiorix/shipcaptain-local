@@ -70,25 +70,49 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const { name, description, permissionIds } = await req.json();
+    const { name, description, isActive, permissions } = await req.json();
 
-    const role = await prisma.role.update({
+    if (!name) return errorResponse("Role name is required", 400);
+    if (!permissions || !Array.isArray(permissions))
+      return errorResponse("Permissions array is required", 400);
+
+    // ✅ Map permissions to role permission format (same as POST)
+    const permissionMappings = permissions.map((p: any) => ({
+      permissionId: p.id,
+      canView: p.flags?.view || false,
+      canCreate: p.flags?.create || false,
+      canEdit: p.flags?.edit || false,
+      canDelete: p.flags?.delete || false,
+    }));
+
+    // ✅ Update existing role with new values
+    const updatedRole = await prisma.role.update({
       where: { id: params.id },
       data: {
         name,
         description,
+        isActive: isActive ?? true,
         rolePermissions: {
-          deleteMany: {}, // clear old relations
-          create: permissionIds?.map((pid: string) => ({ permissionId: pid })) || [],
+          deleteMany: {}, // remove old permissions
+          create: permissionMappings.map((perm) => ({
+            permissionId: perm.permissionId,
+            canView: perm.canView,
+            canCreate: perm.canCreate,
+            canEdit: perm.canEdit,
+            canDelete: perm.canDelete,
+          })),
         },
       },
       include: {
-        rolePermissions: { include: { permission: true } },
+        rolePermissions: {
+          include: { permission: true },
+        },
       },
     });
 
-    return successResponse(role, "Role updated successfully");
+    return successResponse(updatedRole, "Role updated successfully");
   } catch (error) {
+    console.error("❌ Error updating role:", error);
     return errorResponse("Failed to update role", 500, error);
   }
 }

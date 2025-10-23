@@ -1,4 +1,3 @@
-// API service for roles - ready for backend integration
 import { Role, CreateRoleRequest, UpdateRoleRequest, PermissionCategory, PermissionsApiResponse, InternalPermissionCategory } from './types';
 
 
