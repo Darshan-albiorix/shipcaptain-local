@@ -25,7 +25,7 @@ export default function DashboardLayout({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Image src="/logo-black.png" alt="Brand logo" width={36} height={36} className="h-9 w-9 rounded-md object-contain" />
-            <div className="text-lg font-semibold tracking-tight">MyApp</div>
+            <div className="text-lg font-semibold tracking-tight">ShipCaptain</div>
           </div>
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E7E2D9] text-black">beta</span>
         </div>

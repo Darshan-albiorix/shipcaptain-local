@@ -23,6 +23,7 @@ export default function RoleDetailPage() {
 
   // Loading and error states
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPermissions, setIsLoadingPermissions] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,20 +31,20 @@ export default function RoleDetailPage() {
   const [categories, setCategories] = useState<InternalPermissionCategory[]>([]);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  // Load permissions from API
+  // Load permissions or role data
   useEffect(() => {
-    loadPermissions();
-  }, []);
-
-  // Load role data when editing
-  useEffect(() => {
-    if (!isNew) {
+    if (isNew) {
+      // For new roles, load base permissions
+      loadPermissions();
+    } else {
+      // For existing roles, load role data (which includes permissions)
       loadRoleData();
     }
   }, [isNew, roleId]);
 
   const loadPermissions = async () => {
     try {
+      setIsLoadingPermissions(true);
       const result = await getPermissions();
       if (result.success) {
         // Transform the API response to internal format
@@ -69,12 +70,15 @@ export default function RoleDetailPage() {
     } catch (err) {
       setError('Failed to load permissions');
       console.error('Error loading permissions:', err);
+    } finally {
+      setIsLoadingPermissions(false);
     }
   };
 
   const loadRoleData = async () => {
     try {
       setIsLoading(true);
+      setIsLoadingPermissions(true);
       setError(null);
       
       const result = await getRole(roleId);
@@ -114,6 +118,7 @@ export default function RoleDetailPage() {
       console.error('Error loading role:', err);
     } finally {
       setIsLoading(false);
+      setIsLoadingPermissions(false);
     }
   };
 
@@ -212,7 +217,7 @@ export default function RoleDetailPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{display}</h1>
           <p className="text-sm text-black/60">{isNew ? 'Define role info and permissions.' : 'Configure permissions for this role.'}</p>
         </div>
-        <button onClick={() => router.push('/dashboard/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9]">Back to list</button>
+        <button onClick={() => router.push('/dashboard/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Back to list</button>
       </div>
 
       {error && (
@@ -255,71 +260,88 @@ export default function RoleDetailPage() {
 
           <div>
             <h3 className="text-base font-medium mb-3">Permissions</h3>
-            <div className="overflow-x-auto rounded-lg border border-black/10">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-black/60 border-b border-black/10">
-                    <th className="py-3 px-4 w-[40%]">&nbsp;</th>
-                    <th className="py-3 px-4">View</th>
-                    <th className="py-3 px-4">Create</th>
-                    <th className="py-3 px-4">Edit</th>
-                    <th className="py-3 px-4">Delete</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories.map((cat) => {
-                    const isCollapsed = !!collapsed[cat.id];
-                    return (
-                      <React.Fragment key={cat.id}>
-                        <tr className="bg-black/5">
-                          <td className="py-3 px-4 font-medium">
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-2"
-                              onClick={() => setCollapsed((m) => ({ ...m, [cat.id]: !m[cat.id] }))}
-                            >
-                              <span className={"transition inline-block " + (isCollapsed ? "-rotate-90" : "rotate-0")}>▾</span>
-                              {cat.name}
-                            </button>
-                          </td>
-                          <td className="py-3 px-4" />
-                          <td className="py-3 px-4" />
-                          <td className="py-3 px-4" />
-                          <td className="py-3 px-4" />
-                        </tr>
-                        {!isCollapsed &&
-                          cat.items.map((item) => (
-                            <tr key={item.id} className="border-t border-black/10">
-                              <td className="py-3 px-4 text-black/80">{item.name}</td>
-                              {(["view", "create", "edit", "delete"] as (keyof InternalPermission['flags'])[]).map((k) => (
-                                <td key={k} className="py-3 px-4">
-                                  <input
-                                    type="checkbox"
-                                    className="h-4 w-4"
-                                    checked={item.flags?.[k] ?? false}
-                                    onChange={() => toggleFlag(cat.id, item.id, k)}
-                                  />
-                                </td>
-                              ))}
+            {isLoadingPermissions ? (
+              <div className="flex items-center justify-center h-32 border border-black/10 rounded-lg">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black mx-auto mb-2"></div>
+                  <p className="text-sm text-black/60">Loading permissions...</p>
+                </div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-black/10">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-black/60 border-b border-black/10">
+                      <th className="py-3 px-4 w-[40%]">&nbsp;</th>
+                      <th className="py-3 px-4">View</th>
+                      <th className="py-3 px-4">Create</th>
+                      <th className="py-3 px-4">Edit</th>
+                      <th className="py-3 px-4">Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categories.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-black/60">
+                          No permissions available
+                        </td>
+                      </tr>
+                    ) : (
+                      categories.map((cat) => {
+                        const isCollapsed = !!collapsed[cat.id];
+                        return (
+                          <React.Fragment key={cat.id}>
+                            <tr className="bg-black/5">
+                              <td className="py-3 px-4 font-medium">
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center gap-2"
+                                  onClick={() => setCollapsed((m) => ({ ...m, [cat.id]: !m[cat.id] }))}
+                                >
+                                  <span className={"transition inline-block " + (isCollapsed ? "-rotate-90" : "rotate-0")}>▾</span>
+                                  {cat.name}
+                                </button>
+                              </td>
+                              <td className="py-3 px-4" />
+                              <td className="py-3 px-4" />
+                              <td className="py-3 px-4" />
+                              <td className="py-3 px-4" />
                             </tr>
-                          ))}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                            {!isCollapsed &&
+                              cat.items.map((item) => (
+                                <tr key={item.id} className="border-t border-black/10">
+                                  <td className="py-3 px-4 text-black/80">{item.name}</td>
+                                  {(["view", "create", "edit", "delete"] as (keyof InternalPermission['flags'])[]).map((k) => (
+                                    <td key={k} className="py-3 px-4">
+                                      <input
+                                        type="checkbox"
+                                        className="h-4 w-4"
+                                        checked={item.flags?.[k] ?? false}
+                                        onChange={() => toggleFlag(cat.id, item.id, k)}
+                                      />
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                          </React.Fragment>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-2">
             <button 
               onClick={handleSave}
-              disabled={isSaving || !formData.name.trim()}
-              className="px-3 py-2 rounded-md bg-black text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSaving || !formData.name.trim() || isLoadingPermissions}
+              className="px-3 py-2 rounded-md bg-black text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSaving ? 'Saving...' : (isNew ? 'Create' : 'Save')}
             </button>
-            <button onClick={() => router.push('/dashboard/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9]">Cancel</button>
+            <button onClick={() => router.push('/dashboard/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Cancel</button>
           </div>
         </div>
       </div>
