@@ -181,7 +181,7 @@ export default function RoleDetailPage() {
       }
 
       if (result.success) {
-        router.push('/dashboard/roles');
+        router.push('/roles');
       } else {
         setError(result.message || (isNew ? 'Failed to create role' : 'Failed to update role'));
       }
@@ -217,7 +217,7 @@ export default function RoleDetailPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{display}</h1>
           <p className="text-sm text-black/60">{isNew ? 'Define role info and permissions.' : 'Configure permissions for this role.'}</p>
         </div>
-        <button onClick={() => router.push('/dashboard/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Back to list</button>
+        <button onClick={() => router.push('/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Back to list</button>
       </div>
 
       {error && (
@@ -341,7 +341,7 @@ export default function RoleDetailPage() {
             >
               {isSaving ? 'Saving...' : (isNew ? 'Create' : 'Save')}
             </button>
-            <button onClick={() => router.push('/dashboard/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Cancel</button>
+            <button onClick={() => router.push('/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Cancel</button>
           </div>
         </div>
       </div>

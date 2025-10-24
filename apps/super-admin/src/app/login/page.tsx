@@ -23,7 +23,7 @@ export default function Login() {
                 <p className="mt-1 text-sm text-black/60">Sign in to your admin account</p>
               </div>
 
-              <form className="mt-6 grid gap-4" onSubmit={(e) => { e.preventDefault(); router.push('/dashboard'); }}>
+              <form className="mt-6 grid gap-4" onSubmit={(e) => { e.preventDefault(); router.push('/roles'); }}>
                 <div className="grid gap-2">
                   <label htmlFor="email" className="text-sm font-medium">Email</label>
                   <input

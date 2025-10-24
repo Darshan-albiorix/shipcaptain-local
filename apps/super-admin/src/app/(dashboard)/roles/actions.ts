@@ -64,7 +64,7 @@ export async function createRole(data: CreateRoleRequest): Promise<ActionResult>
     });
 
     // Revalidate the roles list page
-    revalidatePath("/dashboard/roles");
+    revalidatePath("/roles");
 
     return {
       success: true,
@@ -148,8 +148,8 @@ export async function updateRole(roleId: string, data: UpdateRoleRequest): Promi
     });
 
     // Revalidate the roles list page and current role page
-    revalidatePath("/dashboard/roles");
-    revalidatePath(`/dashboard/roles/${roleId}`);
+    revalidatePath("/roles");
+    revalidatePath(`/roles/${roleId}`);
 
     return {
       success: true,
@@ -187,7 +187,7 @@ export async function deleteRole(roleId: string): Promise<ActionResult> {
     });
 
     // Revalidate the roles list page
-    revalidatePath("/dashboard/roles");
+    revalidatePath("/roles");
 
     return {
       success: true,

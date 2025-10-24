@@ -38,7 +38,7 @@ export default async function RolesPermissionsPage() {
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Users & Roles</h1>
-        <Link href="/dashboard/roles/new" className="px-3 py-2 rounded-md bg-black text-white text-sm">
+        <Link href="/roles/new" className="px-3 py-2 rounded-md bg-black text-white text-sm">
           Create Role
         </Link>
       </div>
@@ -60,7 +60,7 @@ export default async function RolesPermissionsPage() {
             roles.map((r) => (
               <Link
                 key={r.id}
-                href={`/dashboard/roles/${r.id}`}
+                href={`/roles/${r.id}`}
                 className="w-full text-left grid md:grid-cols-[1.5fr_1fr_.8fr_1fr] items-center px-3 py-3 transition hover:bg-black/5"
               >
                 <div className="font-medium text-black">{r.name}</div>
