@@ -3,6 +3,7 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
+import { Button } from "@repo/ui/components/ui/button";
 import { RoleFormData, InternalPermissionCategory, InternalPermission } from "../types";
 import { createRole, updateRole, getRole, getPermissions } from "../actions";
 
@@ -217,7 +218,7 @@ export default function RoleDetailPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{display}</h1>
           <p className="text-sm text-black/60">{isNew ? 'Define role info and permissions.' : 'Configure permissions for this role.'}</p>
         </div>
-        <button onClick={() => router.push('/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Back to list</button>
+        <Button variant="outline" onClick={() => router.push('/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Back to list</Button>
       </div>
 
       {error && (
@@ -334,14 +335,14 @@ export default function RoleDetailPage() {
           </div>
 
           <div className="flex gap-2">
-            <button 
+            <Button 
               onClick={handleSave}
               disabled={isSaving || !formData.name.trim() || isLoadingPermissions}
               className="px-3 py-2 rounded-md bg-black text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSaving ? 'Saving...' : (isNew ? 'Create' : 'Save')}
-            </button>
-            <button onClick={() => router.push('/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Cancel</button>
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/roles')} className="px-3 py-2 rounded-md border border-black/10 text-sm hover:bg-[#E7E2D9] cursor-pointer">Cancel</Button>
           </div>
         </div>
       </div>

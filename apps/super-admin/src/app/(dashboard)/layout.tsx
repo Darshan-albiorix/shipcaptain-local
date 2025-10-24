@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { Button } from "@repo/ui/components/ui/button";
 import SidebarNav from "./SidebarNav";
 
 export default function DashboardLayout({
@@ -38,9 +39,11 @@ export default function DashboardLayout({
         <header className="sticky top-0 z-10 border-b border-black/10 bg-white p-3 shadow-md">
           <div className="mx-auto max-w-7xl flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
-                className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-black/10 hover:bg-black/5"
+                variant="outline"
+                size="icon"
+                className="md:hidden"
                 aria-label="Open sidebar"
                 aria-expanded={isSidebarOpen}
                 onClick={() => setIsSidebarOpen((v) => !v)}
@@ -50,7 +53,7 @@ export default function DashboardLayout({
                   <line x1="3" y1="6" x2="21" y2="6" />
                   <line x1="3" y1="18" x2="21" y2="18" />
                 </svg>
-              </button>
+              </Button>
               <div className="font-medium"></div>
             </div>
             <div className="flex items-center gap-2">
@@ -59,7 +62,9 @@ export default function DashboardLayout({
                 placeholder="Search"
                 className="px-3 py-1.5 border border-black/20 rounded-md outline-none focus:ring-2 focus:ring-black/20 bg-white placeholder-black/40"
               />
-              <a href="/login" className="text-sm text-black/70 hover:bg-[#E7E2D9] px-2 py-1 rounded-md">Logout</a>
+              <Button variant="ghost" size="sm" asChild className="text-sm text-black/70 hover:bg-[#E7E2D9] px-2 py-1 rounded-md">
+                <a href="/login">Logout</a>
+              </Button>
             </div>
           </div>
         </header>

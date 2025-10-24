@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
+import { Button } from "@repo/ui/components/ui/button";
 export default function Login() {
   const router = useRouter();
   return (
@@ -45,17 +45,16 @@ export default function Login() {
                     className="h-11 rounded-md border border-black/20 bg-white px-3 outline-none focus:ring-2 focus:ring-black/20"
                   />
                 </div>
-                <button
+                <Button
                   type="submit"
-                  className="h-11 w-full rounded-md bg-black text-white transition hover:bg-black/90"
+                  className="h-11 w-full bg-black text-white cursor-pointer"
                 >
                   Sign in
-                </button>
+                </Button>
                 
                 <a href="#" className="text-xs text-black/60 hover:text-black text-center">Forgot password?</a>
 
               </form>
-
               <p className="mt-4 text-center text-xs text-black/50">
                 By continuing you agree to our <a href="#" className="underline hover:text-black">Terms</a> and <a href="#" className="underline hover:text-black">Privacy Policy</a>.
               </p>

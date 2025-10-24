@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@repo/ui/components/ui/button";
 import { prisma } from "@repo/db";
 
 async function getRoles() {
@@ -38,9 +39,9 @@ export default async function RolesPermissionsPage() {
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Users & Roles</h1>
-        <Link href="/roles/new" className="px-3 py-2 rounded-md bg-black text-white text-sm">
-          Create Role
-        </Link>
+        <Button asChild className="px-3 py-2 rounded-md bg-black text-white text-sm">
+          <Link href="/roles/new">Create Role</Link>
+        </Button>
       </div>
 
       <div className="rounded-xl border border-black/10 bg-white p-4">
