@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Button } from "@repo/ui/components/ui/button";
 import { prisma } from "@repo/db";
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui/components/ui/table";
+import { cookies } from "next/headers";
 async function getRoles() {
   try {
     const roles = await prisma.role.findMany({
@@ -34,17 +35,36 @@ async function getRoles() {
 
 export default async function RolesPermissionsPage() {
   const roles = await getRoles();
-
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Users & Roles</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Users & Roles</h1>
         <Button asChild className="px-3 py-2 rounded-md bg-black text-white text-sm">
           <Link href="/roles/new">Create Role</Link>
         </Button>
       </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Role Name</TableHead>
+            <TableHead>Users</TableHead>
+            <TableHead>Role Status</TableHead>
+            <TableHead>Date created</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {roles.map((r) => (
+            <TableRow key={r.id}>
+              <TableCell><Link href={`/roles/${r.id}`}>{r.name}</Link></TableCell>
+              <TableCell>{r.users}</TableCell>
+              <TableCell>{r.isActive ? 'Active' : 'Inactive'}</TableCell>
+              <TableCell>{r.createdAt}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-      <div className="rounded-xl border border-black/10 bg-white p-4">
+      {/* <div className="rounded-xl border border-black/10 bg-white p-4">
 
         <div className="grid md:grid-cols-[1.5fr_1fr_.8fr_1fr] text-sm font-medium text-black/60 px-3">
           <div>Role Name</div>
@@ -78,7 +98,7 @@ export default async function RolesPermissionsPage() {
             ))
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

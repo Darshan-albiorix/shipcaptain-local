@@ -4,7 +4,6 @@ import { prisma } from "@repo/db";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { redirect } from "next/navigation";
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
@@ -33,13 +32,13 @@ export async function login(formData: FormData) {
   }
 
   // 2️⃣ Compare password
-  const isValid = await bcrypt.compare(password, admin.password);
+  const isValid = await bcrypt.compare(password, admin?.password || "");
   if (!isValid) {
     return { success: false, message: "Invalid credentials." };
   }
 
   // 3️⃣ Check account status
-  if (!admin.isActive) {
+  if (!admin?.isActive) {
     return { success: false, message: "Account is inactive." };
   }
 
@@ -47,7 +46,7 @@ export async function login(formData: FormData) {
   // console.log("Admin found:", admin);
 
   // 4️⃣ Build permission map
-  const permissions = admin.role.rolePermissions.map((rp) => ({
+  const permissions = admin.role?.rolePermissions.map((rp) => ({
     key: rp.permission.key,
     canView: rp.canView,
     canCreate: rp.canCreate,
@@ -60,8 +59,7 @@ export async function login(formData: FormData) {
     id: admin.id,
     email: admin.email,
     name: `${admin.firstName} ${admin.lastName}`,
-    role: admin.role.name,
-    permissions,
+    role: admin.role?.name,
   };
 
   // 6️⃣ Sign JWT
@@ -77,15 +75,13 @@ export async function login(formData: FormData) {
     maxAge: 60 * 60 * 24,
   });
 
-  console.log("JWT token stored in cookie.");
-  redirect("/roles");
   return {
     success: true,
     message: "Login successful.",
     user: {
       id: admin.id,
       email: admin.email,
-      role: admin.role.name,
+      role: admin.role?.name,
       permissions,
     },
   };

@@ -1,12 +1,22 @@
+"use client";
 import Image from "next/image";
 import { Button } from "@repo/ui/components/ui/button";
 import { login } from "./login.action";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-export default async function Login() {
-
-   
-
-
+export default function Login() {
+  const router = useRouter();
+  const handleLogin = async (formData: FormData) => {
+    const result = await login(formData);    
+    if (result.success) {
+      toast.success(result.message);
+      router.push("/roles");
+    } else {
+      console.log(result);
+      toast.error(result.message);
+    }
+  }
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(1200px_600px_at_-10%_-10%,#E7E2D9,transparent),radial-gradient(900px_500px_at_110%_0%,#EFEDE7,transparent)]">
       <div className="pointer-events-none absolute inset-0 opacity-40">
@@ -26,14 +36,14 @@ export default async function Login() {
                 <p className="mt-1 text-sm text-black/60">Sign in to your admin account</p>
               </div>
 
-              <form className="mt-6 grid gap-4" action={login}>
+              <form className="mt-6 grid gap-4" action={handleLogin}>
                 <div className="grid gap-2">
                   <label htmlFor="email" className="text-sm font-medium">Email</label>
                   <input
                     id="email"
                     type="email"
                     name="email"
-                    defaultValue="demo@example.com"
+                    defaultValue="admin@shipcaptain.com"
                     placeholder="you@example.com"
                     required
                     className="h-11 rounded-md border border-black/20 bg-white px-3 outline-none placeholder-black/40 focus:ring-2 focus:ring-black/20"

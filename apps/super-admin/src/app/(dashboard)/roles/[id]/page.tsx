@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { RoleFormData, InternalPermissionCategory, InternalPermission } from "../types";
-import { createRole, updateRole, getRole, getPermissions } from "../actions";
-
+import { createRole, updateRole, getRole, getPermissions } from "../role.actions";
+import { ChevronDownIcon } from "lucide-react";
 export default function RoleDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -292,21 +292,17 @@ export default function RoleDetailPage() {
                         const isCollapsed = !!collapsed[cat.id];
                         return (
                           <React.Fragment key={cat.id}>
-                            <tr className="bg-black/5">
-                              <td className="py-3 px-4 font-medium">
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center gap-2"
-                                  onClick={() => setCollapsed((m) => ({ ...m, [cat.id]: !m[cat.id] }))}
-                                >
-                                  <span className={"transition inline-block " + (isCollapsed ? "-rotate-90" : "rotate-0")}>▾</span>
-                                  {cat.name}
-                                </button>
+                            <tr className="bg-[#f0eee9]">
+                              <td 
+                                className="py-3 px-4 font-medium cursor-pointer hover:bg-[#E7E2D9] transition-colors border-b border-black/10" 
+                                colSpan={5}
+                                onClick={() => setCollapsed((m) => ({ ...m, [cat.id]: !m[cat.id] }))}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span>{cat.name}</span>
+                                  <ChevronDownIcon className={`transition-transform ${isCollapsed ? "-rotate-90" : "rotate-0"}`} />
+                                </div>
                               </td>
-                              <td className="py-3 px-4" />
-                              <td className="py-3 px-4" />
-                              <td className="py-3 px-4" />
-                              <td className="py-3 px-4" />
                             </tr>
                             {!isCollapsed &&
                               cat.items.map((item) => (
