@@ -166,40 +166,33 @@ export async function updateRole(roleId: string, data: UpdateRoleRequest): Promi
   }
 }
 
-export async function deleteRole(roleId: string): Promise<ActionResult> {
+export async function deleteRole(formData: FormData) {
+  const roleId = formData.get("id") as string;
   try {
-    // Check if role exists
-    const existingRole = await prisma.role.findUnique({
-      where: { id: roleId }
-    });
-
-    if (!existingRole) {
-      return {
-        success: false,
-        message: "Role not found",
-        error: "Role not found"
-      };
-    }
-
     // Delete the role
     await prisma.role.delete({ 
-      where: { id: roleId } 
+      where: { id: roleId },
+      include: {
+        rolePermissions: {
+          include: { permission: true },
+        },
+      }
     });
 
     // Revalidate the roles list page
     revalidatePath("/roles");
 
-    return {
-      success: true,
-      message: "Role deleted successfully"
-    };
+    // return {
+    //   success: true,
+    //   message: "Role deleted successfully"
+    // };
   } catch (error) {
     console.error("❌ Error deleting role:", error);
-    return {
-      success: false,
-      message: "Failed to delete role",
-      error: error instanceof Error ? error.message : "Unknown error"
-    };
+    // return {
+    //   success: false,
+    //   message: "Failed to delete role",
+    //   error: error instanceof Error ? error.message : "Unknown error"
+    // };
   }
 }
 

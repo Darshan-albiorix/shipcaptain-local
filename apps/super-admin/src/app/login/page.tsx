@@ -4,17 +4,37 @@ import { Button } from "@repo/ui/components/ui/button";
 import { login } from "./login.action";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useGlobalLoader } from "@repo/ui/components/ui/global-loader";
 
 export default function Login() {
   const router = useRouter();
+  const { showLoader, hideLoader } = useGlobalLoader();
+  
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    await handleLogin(formData);
+  }
+  
   const handleLogin = async (formData: FormData) => {
-    const result = await login(formData);    
-    if (result.success) {
-      toast.success(result.message);
-      router.push("/roles");
-    } else {
-      console.log(result);
-      toast.error(result.message);
+    try {
+      showLoader("Signing in...");
+      const result = await login(formData);
+      if (result.success) {
+        toast.success(result.message);
+        // Delay navigation to allow toast to be visible
+        setTimeout(() => {
+          router.push("/roles");
+        }, 500);
+      } else {
+        console.log(result);
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred during login");
+    } finally {
+      hideLoader();
     }
   }
   return (
@@ -36,7 +56,7 @@ export default function Login() {
                 <p className="mt-1 text-sm text-black/60">Sign in to your admin account</p>
               </div>
 
-              <form className="mt-6 grid gap-4" action={handleLogin}>
+              <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
                 <div className="grid gap-2">
                   <label htmlFor="email" className="text-sm font-medium">Email</label>
                   <input

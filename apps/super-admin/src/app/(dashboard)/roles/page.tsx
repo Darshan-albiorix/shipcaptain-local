@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Button } from "@repo/ui/components/ui/button";
 import { prisma } from "@repo/db";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui/components/ui/table";
-import { cookies } from "next/headers";
+import { Trash } from "lucide-react";
+import { DeleteRoleButton } from "./DeleteRoleButton";
 async function getRoles() {
   try {
     const roles = await prisma.role.findMany({
@@ -39,7 +40,10 @@ export default async function RolesPermissionsPage() {
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight">Users & Roles</h1>
-        <Button asChild className="px-3 py-2 rounded-md bg-black text-white text-sm">
+        <Button
+          asChild
+          className="px-3 py-2 rounded-md bg-black text-white text-sm"
+        >
           <Link href="/roles/new">Create Role</Link>
         </Button>
       </div>
@@ -50,15 +54,30 @@ export default async function RolesPermissionsPage() {
             <TableHead>Users</TableHead>
             <TableHead>Role Status</TableHead>
             <TableHead>Date created</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {roles.map((r) => (
-            <TableRow key={r.id}>
-              <TableCell><Link href={`/roles/${r.id}`}>{r.name}</Link></TableCell>
-              <TableCell>{r.users}</TableCell>
-              <TableCell>{r.isActive ? 'Active' : 'Inactive'}</TableCell>
-              <TableCell>{r.createdAt}</TableCell>
+            <TableRow key={r.id} className="hover:bg-black/5 cursor-pointer">
+
+                <TableCell className="p-0"><Link href={`/roles/${r.id}`} className="block w-full h-full px-3 py-2">{r.name}</Link></TableCell>
+                <TableCell className="p-0"><Link href={`/roles/${r.id}`} className="block w-full h-full px-3 py-2">{r.users}</Link></TableCell>
+                <TableCell className="p-0"><Link href={`/roles/${r.id}`} className="block w-full h-full px-3 py-2">
+                  <span
+                    className={`inline-block text-[11px] px-2 py-0.5 rounded-full ${
+                      r.isActive
+                        ? "bg-green-200 text-green-800"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    {r.isActive ? "Active" : "Inactive"}
+                  </span>
+                </Link></TableCell>
+                <TableCell className="p-0"><Link href={`/roles/${r.id}`} className="block w-full h-full px-3 py-2">{r.createdAt}</Link></TableCell>
+                <TableCell>
+                  <DeleteRoleButton id={r.id} name={r.name} />
+                </TableCell>
             </TableRow>
           ))}
         </TableBody>

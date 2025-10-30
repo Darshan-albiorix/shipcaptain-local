@@ -77,7 +77,7 @@ model RolePermission {
   canEdit      Boolean @default(false)
   canDelete    Boolean @default(false)
 
-  role       Role       @relation(fields: [roleId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission Permission @relation(fields: [permissionId], references: [id])
 
   @@unique([roleId, permissionId])
