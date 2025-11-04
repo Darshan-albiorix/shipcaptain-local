@@ -3,16 +3,23 @@ import Image from "next/image";
 import { Button } from "@repo/ui/components/ui/button";
 import { login } from "./login.action";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { useGlobalLoader } from "@repo/ui/components/ui/global-loader";
+import { useForm } from "react-hook-form";
+import { toast } from "@repo/ui/components/ui/sonner";
 
 export default function Login() {
   const router = useRouter();
   const { showLoader, hideLoader } = useGlobalLoader();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<{ email: string; password: string }>({
+    defaultValues: { email: "admin@shipcaptain.com", password: "admin123" },
+    mode: "onBlur",
+    reValidateMode: "onChange",
+  });
   
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  const onSubmit = async (data: { email: string; password: string }) => {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
     await handleLogin(formData);
   }
   
@@ -21,18 +28,16 @@ export default function Login() {
       showLoader("Signing in...");
       const result = await login(formData);
       if (result.success) {
-        toast.success(result.message);
+        toast.success("Signed in successfully");
         // Delay navigation to allow toast to be visible
         setTimeout(() => {
           router.push("/roles");
         }, 500);
       } else {
-        console.log(result);
-        toast.error(result.message);
+        toast.error((result as any)?.message ?? "Invalid email or password");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("An error occurred during login");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       hideLoader();
     }
@@ -56,37 +61,48 @@ export default function Login() {
                 <p className="mt-1 text-sm text-black/60">Sign in to your admin account</p>
               </div>
 
-              <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
+              <form className="mt-6 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid gap-2">
                   <label htmlFor="email" className="text-sm font-medium">Email</label>
                   <input
                     id="email"
                     type="email"
-                    name="email"
-                    defaultValue="admin@shipcaptain.com"
                     placeholder="you@example.com"
-                    required
                     className="h-11 rounded-md border border-black/20 bg-white px-3 outline-none placeholder-black/40 focus:ring-2 focus:ring-black/20"
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /[^\s@]+@[^\s@]+\.[^\s@]+/,
+                        message: "Enter a valid email",
+                      },
+                    })}
                   />
+                  {errors.email?.message && (
+                    <span className="text-xs text-red-600">{errors.email.message}</span>
+                  )}
                 </div>
                 <div className="grid gap-2">
                     <label htmlFor="password" className="text-sm font-medium">Password</label>                  
                   <input
                     id="password"
                     type="password"
-                    name="password"
-                    defaultValue="admin123"
-                    required
                     className="h-11 rounded-md border border-black/20 bg-white px-3 outline-none focus:ring-2 focus:ring-black/20"
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: { value: 6, message: "Minimum 6 characters" },
+                    })}
                   />
+                  {errors.password?.message && (
+                    <span className="text-xs text-red-600">{errors.password.message}</span>
+                  )}
                 </div>
                 <Button
                   type="submit"
-                  className="h-11 w-full bg-black text-white cursor-pointer"
+                  className="h-11 w-full bg-black text-white cursor-pointer disabled:opacity-50"
+                  disabled={isSubmitting}
                 >
-                  Sign in
+                  {isSubmitting ? "Signing in..." : "Sign in"}
                 </Button>
-                
                 <a href="#" className="text-xs text-black/60 hover:text-black text-center">Forgot password?</a>
 
               </form>

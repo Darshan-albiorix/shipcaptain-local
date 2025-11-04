@@ -2,9 +2,6 @@ import { Button } from "@repo/ui/components/ui/button";
 import SideMenu from "./SideMenu";
 import { SidebarProvider, SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { LogOutIcon } from "lucide-react";
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { logout } from "./logout.action";
 
 export default function DashboardLayout({

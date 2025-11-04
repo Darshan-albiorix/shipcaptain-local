@@ -92,7 +92,7 @@ export function GlobalLoader() {
       <div
         className={cn(
           "flex flex-col items-center justify-center gap-4",
-          "rounded-2xl border-2 border-black/20 bg-gray-400 p-8 shadow-2xl",
+          "rounded-2xl border-2 border-black/20 bg-gray-300 p-8 shadow-2xl",
           "min-w-[200px]"
         )}
       >

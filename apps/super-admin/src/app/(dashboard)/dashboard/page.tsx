@@ -2,7 +2,7 @@ export default function DashboardHome() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[#171717]">Welcome to ShipCaptain</h1>
+        <h1 className="text-3xl font-bold text-[#171717]">Welcome</h1>
         <p className="text-black/60 mt-2">Manage your fleet and operations from here.</p>
       </div>
       

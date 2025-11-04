@@ -1,12 +1,14 @@
 'use client';
-import { UsersIcon } from 'lucide-react';
+import { IdCardIcon, LayoutDashboardIcon, UsersIcon } from 'lucide-react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@repo/ui/components/ui/sidebar';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 const links = [
-  { title: 'Roles & Permissions', url: '/roles', icon: UsersIcon },
+  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboardIcon },
+  { title: 'Roles & Permissions', url: '/roles', icon: IdCardIcon },
+  { title: 'Admins', url: '/admins', icon: UsersIcon },
 ];
 
 export default function SideMenu() {
